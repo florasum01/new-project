@@ -1,0 +1,267 @@
+
+
+$err = ['uid' => '', 'pass'=>'','conf'=>'', 'requid'=>'', 'npass'=>'', 'cpass'=>'', 'delid'=>''];
+session_start();
+
+
+
+
+	 if(isset($_POST['btnSubmit']))
+	{
+		if ($_POST['uid']=='')
+	   {
+		    $err['uid'] ="User Id required";
+		   	   
+	   }
+
+	   else	if ($_POST['pass']=='')
+	   {
+		    $err['pass'] ="Password required";
+		   	   
+	   }
+
+	   else if ($_POST['repass']=='')
+	   {
+		    $err['conf'] ="Password required again";
+		   	   
+	   }
+
+	   else if ($_POST['pass'] != $_POST['repass'])
+	   
+	   {
+		   $err['conf'] = "password do not match";
+		   
+	   }
+
+
+	   else
+	   {
+		require_once('C:\xampp\htdocs\project\database\dbconnector.php');
+
+		//select
+		$sql = "SELECT * FROM loggers where user_id= '$_POST[uid]'";
+		$result = mysql_query($sql);
+
+		if(mysql_num_rows($result) != 0)
+			{$err['uid'] = "User ID allready exists";}
+
+		else
+			{
+			//INSERT
+			$sql = "INSERT INTO loggers VALUES (null, '$_POST[utype]', '$_POST[uid]', '$_POST[pass]')";
+			mysql_query($sql);
+
+			$err['uid'] ="User Added";
+
+			}
+	   }
+	}
+
+
+	else if(isset($_POST['changepass']))
+	{
+		if ($_POST['requid']=='')
+	   {
+		    $err['requid'] ="User Id required";
+		   	   
+	   }
+
+	   else	if ($_POST['newpass']=='')
+	   {
+		    $err['npass'] ="Password required";
+		   	   
+	   }
+
+	   else if ($_POST['confirmpass']=='')
+	   {
+		    $err['cpass'] ="Password required again";
+		   	   
+	   }
+
+	   else if ($_POST['newpass'] != $_POST['confirmpass'])
+	   
+	   {
+		   $err['cpass'] = "password do not match";
+		   
+	   }
+
+
+	   else
+	   {
+		require_once('C:\xampp\htdocs\project\database\dbconnector.php');
+
+		//select
+		$sql = "SELECT * FROM loggers where user_id= '$_POST[requid]'";
+		$result = mysql_query($sql);
+
+		if(mysql_num_rows($result) != 0)
+			{
+			//update
+			$sql = "UPDATE loggers SET password ='$_POST[newpass]' WHERE user_id = '$_POST[requid]'";
+			mysql_query($sql);
+
+ 			$err['cpass'] ="Password changed";
+			}
+
+		else
+			{
+			//INSERT
+
+			$err['requid'] = "User ID doesn't exist";
+			}
+	   }
+	}
+
+	else if(isset($_POST['deluser']))
+	{
+		if ($_POST['deluid']=='')
+	   {
+		    $err['delid'] ="User Id required";
+		   	   
+	   }
+
+
+	   else
+	   {
+		require_once('C:\xampp\htdocs\project\database\dbconnector.php');
+
+		//select
+		$sql = "SELECT * FROM loggers where user_id= '$_POST[deluid]'";
+		$result = mysql_query($sql);
+
+		if(mysql_num_rows($result) != 0)
+			{
+			//delete
+			$sql = "DELETE FROM loggers where user_id= '$_POST[deluid]'";
+			mysql_query($sql);
+	
+			$err['delid'] ="User Deleted";
+			}
+
+		else
+			{
+			//INSERT
+
+			$err['delid'] = "User ID doesn't exist";
+			}
+	   }
+	}
+
+?>
+
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>ADMIN</title>
+</head>
+<body>
+
+<center>
+	<h2><u>ADMIN</u></h2>
+	 
+
+	 <a href="login.php">LOGOUT</a> | <a href="admin.php">REFRESH</a>
+
+
+	<fieldset style="width: 500px"> <legend><h3>ADD LOGGER</h3></legend>
+	<form method="post">
+
+		<table>
+
+			<tr>
+				<td><b>User type:</b></td>
+				<td>
+				<Select name="utype">
+				 <option> Admin </option>
+				 <option> Manager </option>
+				 </Select>
+				</td>
+			</tr>
+
+			<tr>
+				<td><b>User Id: </b></td>
+				<td><input type="text" autocomplete="off" name="uid" /></td> 
+				<td> <b> <?php echo $err['uid']; ?> </b></td>
+			</tr>
+
+			<tr>
+				<td><b>Password: </b></td>
+				<td><input type="password" name="pass" /></td> 
+				<td> <b> <?php echo $err['pass']; ?> </b> </td>
+			</tr>
+
+			<tr>
+				<td><b>Confirm Password: </b></td>
+				<td><input type="password" name="repass" /></td> 
+				<td> <b> <?php echo $err['conf']; ?> </b> </td> 
+			</tr>
+
+			<tr>
+				<td></td>
+				<td><input type="submit" name="btnSubmit" value="Create Logger" /></td>
+			</tr>
+		</table>
+	</form>
+</fieldset>
+
+<fieldset style="width: 500px"> <legend><h3>CHANGE LOGGER'S PASSWORD</h3></legend>
+	<form method="post">
+
+		<table>
+
+
+			<tr>
+				<td><b>Requested Id: </b></td>
+				<td><input type="text" autocomplete="off" name="requid" /></td> 
+				<td> <b> <?php echo $err['requid']; ?> </b> </td>
+			</tr>
+
+			<tr>
+				<td><b>New Password: </b></td>
+				<td><input type="password" name="newpass" /></td> 
+				<td> <b> <?php echo $err['npass']; ?> </b> </td>
+			</tr>
+
+			<tr>
+				<td><b>Confirm Password: </b></td>
+				<td><input type="password" name="confirmpass" /></td> 
+				<td> <b> <?php echo $err['cpass']; ?> </b> </td> 
+			</tr>
+
+			<tr>
+				<td></td>
+				<td><input type="submit" name="changepass" value="Change Password" /></td>
+			</tr>
+		</table>
+	</form>
+</fieldset>
+
+
+<fieldset style="width: 500px"> <legend><h3>REMOVE LOGGER</h3></legend>
+	<form method="post">
+
+		<table>
+
+
+			<tr>
+				<td><b>TARGET ID: </b></td>
+				<td><input type="text" autocomplete="off" name="deluid" /></td>
+				<td> <b> <?php echo $err['delid']; ?> <b> </td> 
+				
+			</tr>
+
+			<tr>
+				<td></td>
+				<td><input type="submit" name="deluser" value="Delete" /></td>
+			</tr>
+		</table>
+	</form>
+</fieldset>
+
+	
+
+
+</center>
+</body>
+</html>
